@@ -1,89 +1,211 @@
 using DalLayer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DalLayer;
 public class DALRepository
 {
 
     TaskAppContext dbcontext;
-    public  DALRepository(){
-       dbcontext=new();
+    public DALRepository()
+    {
+        dbcontext = new();
     }
 
 
-//method to check whether the user exists or not in the db 
-    public bool CheckUser(string username){
-        bool status=false;
+    //method to check whether the user exists or not in the db 
+    public bool CheckUser(string username)
+    {
+        bool status = false;
         try
         {
-           
-        var user=   dbcontext.Users.Where(x=>x.UserName==username).FirstOrDefault();
-        if(user!=null)status=true;
-            
+
+            var user = dbcontext.Users.Where(x => x.UserName == username).FirstOrDefault();
+            if (user != null) status = true;
+
         }
         catch (System.Exception)
         {
-            status=false;
+            status = false;
+
+        }
+        return status;
+    }
+
+    public User RegisterUser(string emailId, string user_name, string password)
+    {
+        User user = null;
+        try
+        {
+            user = new User
+            {
+                EmailId = emailId,
+                UserName = user_name,
+                Password = password
+            };
+            dbcontext.Users.Add(user);
+            dbcontext.SaveChanges();
+
+        }
+        catch (System.Exception)
+        {
+
+            user = null;
+        }
+        return user;
+    }
+
+    public User GetUser(string username)
+    {
+        User user = null;
+        try
+        {
+            user = dbcontext.Users.Where(x => x.UserName == username).FirstOrDefault();
+
+        }
+        catch (System.Exception)
+        {
+            
+            user = null;
+        }
+        return user;
+    }
+
+    //  ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Group DalMethods 
+
+    public List<Group> GetAllGroupsJoined(int userId)
+    {
+        List<Group> groups = new List<Group>();
+        try
+        {
+            groups = dbcontext.Groups.Join(dbcontext.GroupJoineds,
+                  grp => grp.GroupId, gj => gj.GroupId,
+                  (grp, gj) => new { grp, gj }).Distinct().Where(x => x.gj.UserId == userId).Select(x => x.grp).ToList();
+           
+        }
+        catch (Exception)
+        {
+            groups = new();
+
+
+        }
+        return groups;
+
+    }
+
+    //create a grp
+
+    public Group CreateGroup(Group grp)
+    {
+        try
+        { 
+           
+            dbcontext.Groups.Add(grp);
+            dbcontext.SaveChanges();
+
+
+            JoinGroup(grp.GroupAdmin, grp.GroupId);
+
+
+            
+
+        }
+        catch (Exception)
+        {
+
+            return null;
+        }
+        return grp;
+    }
+
+    //join a grp
+    public bool JoinGroup(int userId,int grpId)
+    {
+        bool status = true;
+        try
+        {
+           var check= dbcontext.GroupJoineds.Where(x => x.GroupId == grpId && x.UserId == userId).FirstOrDefault();
+            if (check != null) { status = false; }
+             else
+            {
+                GroupJoined grp = new GroupJoined
+                {
+                    GroupId = grpId,
+                    UserId = userId,
+                    DateJoined = DateTime.Now
+                };
+                dbcontext.GroupJoineds.Add(grp);
+                dbcontext.SaveChanges();
+                status = true;
+            }
+
+        }
+        catch (Exception)
+        {
+            status = false;
             
         }
         return status;
     }
 
-    public User RegisterUser(string emailId, string user_name,string password){
-        User user=null;
-        try
-        {   user = new User{
-                        EmailId=emailId,
-                        UserName=user_name,
-                        Password=password
-               };
-            dbcontext.Users.Add(user);
-            dbcontext.SaveChanges();
-            
-        }
-        catch (System.Exception)
-        {
-            
-            user=null;
-        }
-        return user;
-    }
- 
- public User GetUser(string username){
-    User user=null;
-    try
+
+    //leave grp
+    //join a grp
+    public bool LeaveGrp(int userId, int grpId)
     {
-         user=dbcontext.Users.Where(x=>x.UserName==username).FirstOrDefault();
-
-    }
-    catch (System.Exception)
-    {
-        
-       user=null;
-    }
-    return user;
- }
-
-//  ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Group DalMethods 
-
-public List<string> GetAllGroups(int userId){
-List<string> allgroups;
+        bool status = true;
         try
         {
-            allgroups = dbcontext.GroupJoineds.Join(
-             dbcontext.Groups,
-             gj => gj.GroupId,
-             g => g.Id,
-             (gj, j) => new { gj, j }
+            var check = dbcontext.GroupJoineds.Where(x => x.GroupId == grpId && x.UserId == userId).FirstOrDefault();
+            if (check == null) { status = false; }
+            else
+            {
+                dbcontext.Remove(check);
+                dbcontext.SaveChanges();
+                status = true;
+            }
 
-              ).Select(x => x.j.GroupName).ToList();
         }
-        catch (System.Exception)
+        catch (Exception)
         {
+            status = false;
 
-            allgroups = new();
         }
-        return allgroups;
+        return status;
+    }
+
+
+    public List<List<Group>> SearchGroupByName(string grpName,int userID)
+    {
+        List<List<Group>> result = new();
+
+        try
+
+
+        {
+            var tResult=  dbcontext.Groups.Join(dbcontext.GroupJoineds,
+                  grp=>grp.GroupId,gj=>gj.GroupId,
+                  (grp, gj) => new{ grp,gj}).Distinct().Where(x=> EF.Functions.Like(x.grp.GroupName, $"%{grpName}%")).ToList();
+            
+            var temp = tResult.Where(x => x.gj.UserId == userID).Select(x => x.grp).ToList();
+            result.Add(temp);
+
+            result.Add(dbcontext.Groups.Where(x => !temp.Contains(x) && EF.Functions.Like(x.GroupName, $"%{grpName}%")).ToList());
+
+           
+
+           
+        }
+        catch (Exception)
+        {
+            List<Group> t = new();
+            result = new List<List<Group>> { t, t };
+           
+
+        }
+        return result;
+    }
+
 }
-    
-}
+
+

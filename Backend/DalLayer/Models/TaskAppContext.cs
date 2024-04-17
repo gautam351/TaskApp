@@ -33,37 +33,43 @@ namespace DalLayer.Models
         {
             modelBuilder.Entity<Group>(entity =>
             {
-                entity.ToTable("Group");
+                entity.Property(e => e.GroupId).HasColumnName("group_id");
 
-                entity.HasIndex(e => e.GroupName, "UQ__Group__E8F4F58DF6AC5B37")
-                    .IsUnique();
+                entity.Property(e => e.DateCreated)
+                    .HasColumnType("datetime")
+                    .HasColumnName("date_created")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Description)
+                    .HasMaxLength(500)
+                    .IsUnicode(false)
+                    .HasColumnName("description");
 
-                entity.Property(e => e.AccessRead)
-                    .HasColumnName("access_read")
-                    .HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.AccessWrite)
-                    .HasColumnName("access_write")
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.AdminUserId).HasColumnName("admin_user_id");
+                entity.Property(e => e.GroupAdmin).HasColumnName("group_admin");
 
                 entity.Property(e => e.GroupName)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("group_name");
 
-                entity.Property(e => e.LastUpdatedTime).HasColumnType("datetime");
-
                 entity.Property(e => e.MemberCount)
                     .HasColumnName("member_count")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ProfileUrl)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("profile_url");
+
+                entity.Property(e => e.ViceAdmin).HasColumnName("vice_admin");
+
+                entity.Property(e => e.Visibility)
+                    .HasColumnName("visibility")
                     .HasDefaultValueSql("((1))");
 
-                entity.Property(e => e.Rating)
-                    .HasColumnName("rating")
-                    .HasDefaultValueSql("((0))");
+                entity.Property(e => e.WriteAccess)
+                    .HasColumnName("write_access")
+                    .HasDefaultValueSql("((1))");
             });
 
             modelBuilder.Entity<GroupJoined>(entity =>

@@ -42,6 +42,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<TestMiddleware>();
 
 
+//cors policy 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyAllowSpecificOrigins",
+                     builder =>
+                     {
+                         builder.AllowAnyOrigin();
+                         builder.AllowAnyHeader();
+                         builder.AllowAnyMethod();
+                     });
+});
+
 
 
 var app = builder.Build();
@@ -57,10 +69,15 @@ app.UseHttpsRedirection();
 // app.UseMiddleware<TestMiddleware>();
 
 
-app.UseWhen(context => context.Request.Path.ToString().Contains("/Register"), appbuilder =>
-{
-    appbuilder.UseMiddleware<TestMiddleware>();
-});
+//app.UseWhen(context => context.Request.Path.ToString().Contains("/Register"), appbuilder =>
+//{
+//    appbuilder.UseMiddleware<TestMiddleware>();
+//});
+
+
+
+//cors
+app.UseCors("MyAllowSpecificOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

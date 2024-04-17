@@ -5,13 +5,15 @@ namespace DalLayer.Models
 {
     public partial class Group
     {
-        public int Id { get; set; }
-        public int AdminUserId { get; set; }
-        public int? Rating { get; set; }
-        public int? MemberCount { get; set; }
-        public int? AccessRead { get; set; }
-        public int? AccessWrite { get; set; }
-        public DateTime LastUpdatedTime { get; set; }
+        public int GroupId { get; set; }
         public string GroupName { get; set; } = null!;
+        public int GroupAdmin { get; set; }
+        public int? MemberCount { get; set; }
+        public int? Visibility { get; set; }
+        public int? WriteAccess { get; set; }
+        public string? ProfileUrl { get; set; }
+        public DateTime? DateCreated { get; set; }
+        public string? Description { get; set; }
+        public int? ViceAdmin { get; set; }
     }
 }

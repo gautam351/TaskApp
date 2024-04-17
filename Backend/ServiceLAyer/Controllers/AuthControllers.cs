@@ -55,7 +55,7 @@ if(repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user a
 
    //return token
 
-  return  CustomResponses.CustomResponse(message:"user registered successfully",201,new {token=token});
+  return  CustomResponses.CustomResponse(message:"user registered successfully",201,new {token,user});
    }
    catch (System.Exception)
    {
@@ -70,19 +70,19 @@ if(repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user a
 
 [HttpPost]
 public IActionResult LoginUser(RegisterUser Ruser){
-
+        bool error = true;
 try
 {
 
   
   // check if user exists or not ; if not exists return error
-  if(!repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user doesn't exists",200,new {});
+  if(!repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user does not  exists",200,new {error});
   
   //check if credentils are correct
   var user=repo.GetUser(Ruser.UserName);
    
   //match the password
-  if(!BCrypt.Net.BCrypt.Verify(Ruser.Password,user.Password)) return CustomResponses.CustomResponse("Invalid Credentials",401,new {});
+  if(!BCrypt.Net.BCrypt.Verify(Ruser.Password,user.Password)) return CustomResponses.CustomResponse("Invalid Credentials",200,new {error});
 
   //generate Token and return 
   // create its token 
@@ -93,7 +93,7 @@ try
 
    //return token
 
-  return  CustomResponses.CustomResponse(message:"user LoggedIn successfully",200,new {token=token});
+  return  CustomResponses.CustomResponse(message:"user LoggedIn successfully",200,new {token,user});
 
   
 }

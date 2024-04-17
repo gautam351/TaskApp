@@ -23,16 +23,25 @@ create table Users(
 
 
 --0 means no acess 1 means acess granted
-create table [Group](
-[id] int constraint pk_id Primary Key identity(1,1),
-[admin_user_id] int not null,
-[rating] int default 0,
-[member_count] int default 1,
-[access_read] int default 1,
-[access_write] int default 0,
-[LastUpdatedTime] datetime NOT NULL,
-);
+--0 means private acess 1 means public 
 
+create table Groups (
+[group_id] int constraint pk_groupid primary key identity(1,1),
+[group_name] varchar(50) not null,
+[group_admin] int not null,
+[member_count] int default 0,
+[visibility] int default 1,
+[write_access] int default 1,
+[profile_url] varchar(255) ,
+[date_created] datetime  default getdate(),
+[description] varchar(500) ,
+[vice_admin] int 
+
+
+
+
+
+)
 
 create table [GroupJoined](
 
