@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -8,12 +8,35 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useNavigate } from 'react-router-dom';
+import { AuthServices } from '../Services/AuthServices';
+import { InvokeToast } from '../utils/Toast';
+import { ToastContainer } from 'react-toastify';
 
 const Login = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const AuthService = new AuthServices();
+  const [username, setusername] = useState("");
+  const [password, setpassword] = useState("");
+    
+  //login handler
+  const handleSubmit = async () => {
+      if (username == "" || password == "") { InvokeToast("Incomplete Details", "error"); return; }
+    const data = await AuthService.Login(username, password);
+    // console.log(data.data);
+    if (data?.data?.error) {
+      
+      InvokeToast(data.message, "error");
+    }
+    else if (!data?.data) {
+      InvokeToast("Something Went Wrong", "error");
+    }
+    else {
+      sessionStorage.setItem("token", data?.data?.token);
+      sessionStorage.setItem("user",JSON.stringify( data?.data?.user));
 
-    const handleSubmit = () => {
-        console.log("login");
+      navigate("/dashboard");
+    }
+   
     }
 
   return (
@@ -29,7 +52,7 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box  sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
@@ -39,6 +62,8 @@ const Login = () => {
             name="email"
             autoComplete="email"
             autoFocus
+            value={username}
+            onChange={(e)=>setusername(e.target.value)}
           />
           <TextField
             margin="normal"
@@ -49,6 +74,8 @@ const Login = () => {
             type="password"
             id="password"
             autoComplete="current-password"
+            value={password}
+            onChange={(e)=>setpassword(e.target.value)}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -59,6 +86,7 @@ const Login = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            onClick={(e)=>handleSubmit()}
           >
             Sign In
           </Button>
@@ -72,6 +100,7 @@ const Login = () => {
           </Grid>
         </Box>
       </Box>
+      <ToastContainer />
     </Container>
   )
 }

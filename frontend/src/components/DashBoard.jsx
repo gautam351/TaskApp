@@ -1,8 +1,16 @@
 import React from 'react'
+import Sidenav from './Sidenav'
+import Header from './Header'
 
+
+//boards
 const DashBoard = () => {
   return (
-    <div>DashBoard</div>
+    <>
+      <Header />
+      
+     
+    </>
   )
 }
 
