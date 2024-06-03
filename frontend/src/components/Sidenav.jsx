@@ -26,7 +26,7 @@ const Sidenav = (props) => {
 
     const items = [
         { text: "Boards", navigate: "/dashboard" ,icon:<Dashboard/> },
-        { text: "Groups", navigate: "/groups"   ,icon:<GroupsIcon/>},
+        { text: "Groups", navigate: "/groups/0"   ,icon:<GroupsIcon/>},
         { text: "Feedback", navigate: "#" ,icon:<RateReviewIcon/>},
         { text: "Settings", navigate: "#" ,icon:<SettingsIcon/>},
 

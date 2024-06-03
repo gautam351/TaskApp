@@ -12,13 +12,13 @@ function App() {
       <Router>
         <Routes>
           <Route  path="" element={<Navigate  to={"/login"}/>} />
-          <Route path={'/login' } element={<Login />} />
-          <Route path={'/Register' } element={<Register/>}   / >
+          <Route  path={'/login' } element={<Login />} />
+          <Route  path={'/Register' } element={<Register/>}   / >
           <Route  element={<PrivateRoute/>}  >
            
-            <Route path='/dashboard' element={<DashBoard />} />
+            <Route exact path='/dashboard' element={<DashBoard />} />
             
-            <Route path='/groups' element={ <Groups />} />
+            <Route exact path='/groups/:groupid' element={ <Groups />} />
             
 
 

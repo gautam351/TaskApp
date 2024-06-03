@@ -9,6 +9,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import { UnauthorizedHelper } from '../utils/HelperFunctions';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import Header from './Header';
+import { useDispatch } from 'react-redux';
+import { resetGroupState, setCurrGroups, setcurrGroupId } from '../redux/GroupChatReducer';
 const GroupList = () => {
 
     const groupControllServices = new GroupControllerServices();
@@ -17,7 +20,7 @@ const GroupList = () => {
     const [groupListToAdd, setgrpListToAdd] = useState([]);
 
     const [searchText, setsearchText] = useState("");
-
+    let dispatch = useDispatch();
   
     const GetData = async () => {
         const data = await groupControllServices.getAllGroups();
@@ -30,6 +33,7 @@ const GroupList = () => {
         else {
             setsearchText("");
             setgrpList(data?.data?.allGroups);
+            // saving the data into the redux store
             setgrpListToAdd([]);
             
         }
@@ -59,7 +63,8 @@ const GroupList = () => {
             InvokeToast("Something Went Wrong", "error");
           }
         else {
-            setgrpList(data?.data?.result[0])
+            setgrpList(data?.data?.result[0]);
+
             setgrpListToAdd(data?.data?.result[1]);
         }
 
@@ -104,12 +109,23 @@ const GroupList = () => {
         }
     }
 
+    const HandleGroupSelect = (grp:any) => {
+        dispatch(setcurrGroupId(grp));
+        dispatch(resetGroupState());
+
+     console.log(grp);
+     
+        naviagte(`/groups/${grp?.groupId}`);
+        
+    }
+    
+
     const renderList = (list:never[],type:number) => {
         return list.map((e: any, indx) => {
             return (
 
                 <span key={indx} >
-                    <ListItem alignItems="flex-start" sx={{ maxHeight: "12vh" }}>
+                    <ListItem alignItems="flex-start" sx={{ maxHeight: "12vh",cursor:"pointer" }} onClick={(evt)=>HandleGroupSelect(e)}>
                         <ListItemAvatar>
                             <Avatar alt={e?.groupName} src="/static/images/avatar/1.jpg" />
                         </ListItemAvatar>
@@ -152,6 +168,8 @@ const GroupList = () => {
     return (
         <>
             <div className="grplistCOntainer" >
+
+                
 
                 {/* -----------------------------search bar --------------------------------------------------- */}
 

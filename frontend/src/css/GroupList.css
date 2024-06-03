@@ -1,16 +1,21 @@
 .groups{
     /* background-color: aqua; */
     width: 100%;
-    height:  94vh;
+    height:  100vh;
     display: flex;
-    max-height: 94vh;
+    max-height: 100vh;
 
 }
 
 .grpList{
 flex:0.25;
+ min-width: 20%;
 /* background-color: azure; */
-max-height: 93.7vh !important;
+max-height: 100vh !important;
  overflow: scroll;
  border-right: 0.5px solid #BDBDBD;
+}
+
+.grpwindow{
+min-width: 80%;
 }

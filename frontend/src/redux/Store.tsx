@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import AuthReducer from './AuthReducer'
+import GroupReducer from './GroupChatReducer'
 
 export const store = configureStore({
     reducer: {
-      Auth:AuthReducer
+    Auth: AuthReducer,
+    group:GroupReducer
   },
 })
 

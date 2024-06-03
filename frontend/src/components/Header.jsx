@@ -11,10 +11,12 @@ import Avatar from '@mui/material/Avatar';
 import Sidenav from "./Sidenav"
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 
-const Header = () => {
+const Header = ({ headerType = "normal" }) => {
+  
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const toggleNavBar = () => {
@@ -25,19 +27,28 @@ const Header = () => {
     sessionStorage.clear();
     navigate("/login");
   }
+
+  const HandleOnCLickTaskApp = () => {
+     if(headerType=="chatScreen"){
+      setOpen(true);
+    }
+     else {
+      navigate("/dashboard"); 
+    }
+  }
   return (
     <>
       {/* sidebar */}
       <Sidenav open={open} toggleNavBar={toggleNavBar} />
       <AppBar position="static">
         <Container maxWidth="xl">
-          <Toolbar disableGutters style={{ display: "flex", justifyContent: 'space-between' }}>
-            <span style={{ cursor: 'pointer' }} onClick={(e) => { setOpen(true); console.log(open); }}> <Avatar> <MenuIcon /></Avatar> </span>
+          <Toolbar disableGutters style={{ display: "flex", justifyContent: headerType=="chatScreen"?"center":"space-between" }}>
+            <span style={{ cursor: 'pointer',display:headerType=="chatScreen"?"none":"block" }} onClick={(e) => { setOpen(true); console.log(open); }}> <Avatar> <MenuIcon /></Avatar> </span>
             <Typography
               variant="h6"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+              onClick={(e)=>HandleOnCLickTaskApp()}
               sx={{
                 mr: 2,
                 display: { xs: 'flex', md: 'flex' },
@@ -46,11 +57,13 @@ const Header = () => {
                 letterSpacing: '.3rem',
                 color: 'inherit',
                 textDecoration: 'none',
+                cursor: "pointer",
+               
               }}
             >
               TASK APP
             </Typography>
-            <span style={{cursor:"pointer"}} onClick={(e)=>HandleLogOut()}>
+            <span style={{cursor:"pointer",display:headerType=="chatScreen"?"none":"block"}} onClick={(e)=>HandleLogOut()}>
               <Avatar >
               <ExitToAppIcon />
               </Avatar>
