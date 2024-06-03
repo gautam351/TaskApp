@@ -18,14 +18,16 @@ namespace DalLayer.Models
 
         public virtual DbSet<Group> Groups { get; set; } = null!;
         public virtual DbSet<GroupJoined> GroupJoineds { get; set; } = null!;
+        public virtual DbSet<GroupMessage> GroupMessages { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<UserMessage> UserMessages { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=BLRKEC334053L\\SQLEXPRESS;Database=TaskApp;User Id=sa;Password=<Your_Password>");
+                optionsBuilder.UseSqlServer("Server=BLRKEC334053L\\SQLEXPRESS;Database=TaskApp;User Id=sa;Password=PraveenGautam@123");
             }
         }
 
@@ -87,6 +89,32 @@ namespace DalLayer.Models
                 entity.Property(e => e.UserId).HasColumnName("user_id");
             });
 
+            modelBuilder.Entity<GroupMessage>(entity =>
+            {
+                entity.Property(e => e.GroupId).HasColumnName("groupId");
+
+                entity.Property(e => e.Msg)
+                    .IsUnicode(false)
+                    .HasColumnName("msg");
+
+                entity.Property(e => e.SendersId).HasColumnName("sendersId");
+
+                entity.Property(e => e.Time)
+                    .HasColumnType("datetime")
+                    .HasColumnName("time")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Group)
+                    .WithMany(p => p.GroupMessages)
+                    .HasForeignKey(d => d.GroupId)
+                    .HasConstraintName("fk_groupid");
+
+                entity.HasOne(d => d.Senders)
+                    .WithMany(p => p.GroupMessages)
+                    .HasForeignKey(d => d.SendersId)
+                    .HasConstraintName("fk_sendersId");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.UserName, "UQ__Users__7C9273C437868ACC")
@@ -123,6 +151,32 @@ namespace DalLayer.Models
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("user_name");
+            });
+
+            modelBuilder.Entity<UserMessage>(entity =>
+            {
+                entity.Property(e => e.Msg)
+                    .IsUnicode(false)
+                    .HasColumnName("msg");
+
+                entity.Property(e => e.RecieversId).HasColumnName("recieversId");
+
+                entity.Property(e => e.SendersId).HasColumnName("sendersId");
+
+                entity.Property(e => e.Time)
+                    .HasColumnType("datetime")
+                    .HasColumnName("time")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Recievers)
+                    .WithMany(p => p.UserMessageRecievers)
+                    .HasForeignKey(d => d.RecieversId)
+                    .HasConstraintName("fk_recieversId");
+
+                entity.HasOne(d => d.Senders)
+                    .WithMany(p => p.UserMessageSenders)
+                    .HasForeignKey(d => d.SendersId)
+                    .HasConstraintName("fk_sendersIdUser");
             });
 
             OnModelCreatingPartial(modelBuilder);

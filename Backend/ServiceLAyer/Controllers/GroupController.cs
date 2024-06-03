@@ -12,14 +12,16 @@ namespace ServiceLAyer.Controllers;
 public class GroupController : ControllerBase
 {
 
-DALRepository repo;
+    DALRepository repo;
 
-public GroupController(){
+    public GroupController()
+    {
         repo = new();
-}
+    }
 
-[HttpGet]
-public IActionResult  GetAllGroups(int userId){
+    [HttpGet]
+    public IActionResult GetAllGroups(int userId)
+    {
         List<Group> allGroups = new();
         try
         {
@@ -30,23 +32,23 @@ public IActionResult  GetAllGroups(int userId){
 
             allGroups = new();
         }
-  return  CustomResponses.CustomResponse(message:"group fetched successfully",200,new {allGroups});
-        
-}
+        return CustomResponses.CustomResponse(message: "group fetched successfully", 200, new { allGroups });
 
-  [HttpPost]
-  public IActionResult CreateGroup(CreateGroupModel grp)
+    }
+
+    [HttpPost]
+    public IActionResult CreateGroup(CreateGroupModel grp)
     {
         Group g = null;
         try
         {
 
-           g= repo.CreateGroup(CreateGroupModel.Convert(grp));    
-      
+            g = repo.CreateGroup(CreateGroupModel.Convert(grp));
+
 
         }
         catch (Exception)
-        {   
+        {
             return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
 
         }
@@ -56,12 +58,12 @@ public IActionResult  GetAllGroups(int userId){
     }
 
     [HttpGet]
-    public IActionResult JoinGroup(int grpID,int userID)
-    { 
-        bool status = false;    
+    public IActionResult JoinGroup(int grpID, int userID)
+    {
+        bool status = false;
         try
         {
-           status=repo.JoinGroup(userID, grpID);
+            status = repo.JoinGroup(userID, grpID);
         }
         catch (Exception)
         {
@@ -74,12 +76,13 @@ public IActionResult  GetAllGroups(int userId){
     }
 
     [HttpGet]
-    public IActionResult SearchGroupByName(string groupName,int userID) {
+    public IActionResult SearchGroupByName(string groupName, int userID)
+    {
         List<List<Group>> result;
-        
+
         try
         {
-            result=repo.SearchGroupByName(groupName,userID);   
+            result = repo.SearchGroupByName(groupName, userID);
         }
         catch (Exception)
         {

@@ -17,114 +17,120 @@ public class AuthControllers : ControllerBase
 {
 
 
-//repo object
-DALRepository repo;
+    //repo object
+    DALRepository repo;
 
-  private IConfiguration _config;
-       
-
-public AuthControllers(IConfiguration config){
-   repo=new();
-   _config=config;
-}
+    private IConfiguration _config;
 
 
-[HttpPost]
-public IActionResult RegisterUser( RegisterUser Ruser){
-   try
-   {
-    //check whther details are complete or not
-   if(Ruser.UserName=="" || Ruser.Password=="" || Ruser.EmailId=="")return  CustomResponses.CustomResponse(message:"Insufficient Details",400,new {});
-   // check if user exists or not ; if exists return error
-
-if(repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user already exists",200,new {});
-
-   // if doesn't exists register user 
-   string hashedPassword= BCrypt.Net.BCrypt.HashPassword(Ruser.Password);
-   
-   User  user= repo.RegisterUser(Ruser.EmailId,Ruser.UserName,hashedPassword);
-      
-   if(user==null) return  CustomResponses.CustomResponse("Internal Server Error",500,new {});
+    public AuthControllers(IConfiguration config)
+    {
+        repo = new();
+        _config = config;
+    }
 
 
-   // create its token 
-    
-    string token= JWTTokenHelper.GenerateToken(user.UserName,_config["Jwt:Key"],_config["Jwt:Issuer"]);
-    
+    [HttpPost]
+    public IActionResult RegisterUser(RegisterUser Ruser)
+    {
+        try
+        {
+            //check whther details are complete or not
+            if (Ruser.UserName == "" || Ruser.Password == "" || Ruser.EmailId == "") return CustomResponses.CustomResponse(message: "Insufficient Details", 400, new { });
+            // check if user exists or not ; if exists return error
+
+            if (repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user already exists", 200, new { });
+
+            // if doesn't exists register user 
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(Ruser.Password);
+
+            User user = repo.RegisterUser(Ruser.EmailId, Ruser.UserName, hashedPassword);
+
+            if (user == null) return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
 
 
-   //return token
+            // create its token 
 
-  return  CustomResponses.CustomResponse(message:"user registered successfully",201,new {token,user});
-   }
-   catch (System.Exception)
-   {
-    
-     return CustomResponses.CustomResponse("Internal Server Error",500,new {});
-   }
-
-
-}
-
-// -------------------------------------------------------------------------------------------------------------------
-
-[HttpPost]
-public IActionResult LoginUser(RegisterUser Ruser){
-        bool error = true;
-try
-{
-
-  
-  // check if user exists or not ; if not exists return error
-  if(!repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user does not  exists",200,new {error});
-  
-  //check if credentils are correct
-  var user=repo.GetUser(Ruser.UserName);
-   
-  //match the password
-  if(!BCrypt.Net.BCrypt.Verify(Ruser.Password,user.Password)) return CustomResponses.CustomResponse("Invalid Credentials",200,new {error});
-
-  //generate Token and return 
-  // create its token 
-    
-    string token= JWTTokenHelper.GenerateToken(user.UserName,_config["Jwt:Key"],_config["Jwt:Issuer"]);
-    
-
-
-   //return token
-
-  return  CustomResponses.CustomResponse(message:"user LoggedIn successfully",200,new {token,user});
-
-  
-}
-catch (System.Exception)
-{
-  
-  return CustomResponses.CustomResponse("Internal Server Error",500,new {});
-}
+            string token = JWTTokenHelper.GenerateToken(user.UserName, _config["Jwt:Key"], _config["Jwt:Issuer"]);
 
 
 
+            //return token
 
-}
+            return CustomResponses.CustomResponse(message: "user registered successfully", 201, new { token, user });
+        }
+        catch (System.Exception)
+        {
 
+            return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
+        }
 
-[Authorize]
-[HttpGet]
-public IActionResult AuthTestFucntion(string name){
-    var token = Request.Headers["Authorization"].ToString().Substring(7);
-    Console.WriteLine(token);
-var handler = new JwtSecurityTokenHandler();
-var decodedToken = handler.ReadJwtToken(token);
-// var decodedToken1 = handler.ReadJwtToken(token).Claims.Where(x=>x.);
-
-    foreach (var item in decodedToken.Claims){
-      Console.WriteLine(item.Type);
-      Console.WriteLine(item.Value);
 
     }
-  return  new JsonResult(name);
-}
+
+    // -------------------------------------------------------------------------------------------------------------------
+
+    [HttpPost]
+    public IActionResult LoginUser(RegisterUser Ruser)
+    {
+        bool error = true;
+        try
+        {
+            Console.WriteLine("Auth");
+
+
+            // check if user exists or not ; if not exists return error
+            if (!repo.CheckUser(Ruser.UserName)) return CustomResponses.CustomResponse("user does not  exists", 200, new { error });
+
+            //check if credentils are correct
+            var user = repo.GetUser(Ruser.UserName);
+
+            //match the password
+            if (!BCrypt.Net.BCrypt.Verify(Ruser.Password, user.Password)) return CustomResponses.CustomResponse("Invalid Credentials", 200, new { error });
+
+            //generate Token and return 
+            // create its token 
+
+            string token = JWTTokenHelper.GenerateToken(user.UserName, _config["Jwt:Key"], _config["Jwt:Issuer"]);
+
+
+
+            //return token
+
+            return CustomResponses.CustomResponse(message: "user LoggedIn successfully", 200, new { token, user });
+
+
+        }
+        catch (System.Exception)
+        {
+
+            return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
+        }
+
+
+
+
+    }
+
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult AuthTestFucntion(string name)
+    {
+        var token = Request.Headers["Authorization"].ToString().Substring(7);
+        Console.WriteLine(token);
+        var handler = new JwtSecurityTokenHandler();
+        var decodedToken = handler.ReadJwtToken(token);
+        // var decodedToken1 = handler.ReadJwtToken(token).Claims.Where(x=>x.);
+
+        foreach (var item in decodedToken.Claims)
+        {
+            Console.WriteLine(item.Type);
+            Console.WriteLine(item.Value);
+
+        }
+        return new JsonResult(name);
+    }
 
 
 

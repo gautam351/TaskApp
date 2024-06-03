@@ -64,7 +64,7 @@ public class DALRepository
         }
         catch (System.Exception)
         {
-            
+
             user = null;
         }
         return user;
@@ -81,7 +81,7 @@ public class DALRepository
             groups = dbcontext.Groups.Join(dbcontext.GroupJoineds,
                   grp => grp.GroupId, gj => gj.GroupId,
                   (grp, gj) => new { grp, gj }).Distinct().Where(x => x.gj.UserId == userId).Select(x => x.grp).ToList();
-           
+
         }
         catch (Exception)
         {
@@ -98,8 +98,8 @@ public class DALRepository
     public Group CreateGroup(Group grp)
     {
         try
-        { 
-           
+        {
+
             dbcontext.Groups.Add(grp);
             dbcontext.SaveChanges();
 
@@ -107,7 +107,7 @@ public class DALRepository
             JoinGroup(grp.GroupAdmin, grp.GroupId);
 
 
-            
+
 
         }
         catch (Exception)
@@ -119,14 +119,14 @@ public class DALRepository
     }
 
     //join a grp
-    public bool JoinGroup(int userId,int grpId)
+    public bool JoinGroup(int userId, int grpId)
     {
         bool status = true;
         try
         {
-           var check= dbcontext.GroupJoineds.Where(x => x.GroupId == grpId && x.UserId == userId).FirstOrDefault();
+            var check = dbcontext.GroupJoineds.Where(x => x.GroupId == grpId && x.UserId == userId).FirstOrDefault();
             if (check != null) { status = false; }
-             else
+            else
             {
                 GroupJoined grp = new GroupJoined
                 {
@@ -143,7 +143,7 @@ public class DALRepository
         catch (Exception)
         {
             status = false;
-            
+
         }
         return status;
     }
@@ -175,7 +175,7 @@ public class DALRepository
     }
 
 
-    public List<List<Group>> SearchGroupByName(string grpName,int userID)
+    public List<List<Group>> SearchGroupByName(string grpName, int userID)
     {
         List<List<Group>> result = new();
 
@@ -183,25 +183,70 @@ public class DALRepository
 
 
         {
-            var tResult=  dbcontext.Groups.Join(dbcontext.GroupJoineds,
-                  grp=>grp.GroupId,gj=>gj.GroupId,
-                  (grp, gj) => new{ grp,gj}).Distinct().Where(x=> EF.Functions.Like(x.grp.GroupName, $"%{grpName}%")).ToList();
-            
+            var tResult = dbcontext.Groups.Join(dbcontext.GroupJoineds,
+                  grp => grp.GroupId, gj => gj.GroupId,
+                  (grp, gj) => new { grp, gj }).Distinct().Where(x =>x.grp.GroupName.Contains(grpName)).ToList();
+
             var temp = tResult.Where(x => x.gj.UserId == userID).Select(x => x.grp).ToList();
             result.Add(temp);
 
-            result.Add(dbcontext.Groups.Where(x => !temp.Contains(x) && EF.Functions.Like(x.GroupName, $"%{grpName}%")).ToList());
+            result.Add(dbcontext.Groups.Where(x => !temp.Contains(x) && x.GroupName.Contains(grpName)).ToList());
 
-           
 
-           
+
+
         }
         catch (Exception)
         {
             List<Group> t = new();
             result = new List<List<Group>> { t, t };
-           
 
+
+        }
+        return result;
+    }
+
+
+    public List<GroupMessage> GetAllGroupMessages(int groupId)
+    {
+        var result = new List<GroupMessage>();
+        try
+        {
+            result=dbcontext.GroupMessages.Where(x=>x.GroupId == groupId).ToList();
+
+        }
+        catch (Exception)
+        {
+
+            result = new();
+        }
+        return result;
+    }
+
+
+    public bool SendMessage(string msg,int groupId,int senderId)
+    {
+        bool result = false;
+        try
+        {
+            var grpMsg = new GroupMessage
+            {
+                Msg = msg,
+                GroupId = groupId,
+                SendersId = senderId,
+
+                
+           };
+
+            dbcontext.Add(grpMsg);
+            dbcontext.SaveChanges();
+            result = true;
+
+        }
+        catch (Exception)
+        {
+
+            result = false;
         }
         return result;
     }

@@ -53,3 +53,33 @@ create table [GroupJoined](
 
 );
 
+
+
+-- table for group messages 
+create table [GroupMessages](
+
+[Id] int  constraint pk_groupMessageId Primary Key  Identity(1,1),
+[msg] varchar(max) NOT NULL ,
+[groupId] int constraint fk_groupid references Groups([group_id]),
+[sendersId] int constraint fk_sendersId references Users([Id]),
+[time] datetime  default GETDate()
+
+
+
+
+)
+
+
+-- table for storing one to one chat messages 
+create table [UserMessages](
+
+[Id] int  constraint pk_userMessageId Primary Key  Identity(1,1),
+[msg] varchar(max) NOT NULL ,
+[recieversId] int constraint fk_recieversId references Users([Id]),
+[sendersId] int constraint fk_sendersIdUser references Users([Id]),
+[time] datetime  default GETDate()
+
+
+
+
+)

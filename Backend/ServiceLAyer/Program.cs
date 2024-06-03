@@ -4,6 +4,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using ServiceLAyer.ChatHub;
 using ServiceLAyer.Middlwares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,15 +43,32 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<TestMiddleware>();
 
 
+//Adding SignalR in teh application
+builder.Services.AddSignalR();  
+
+
 //cors policy 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "MyAllowSpecificOrigins",
                      builder =>
                      {
-                         builder.AllowAnyOrigin();
-                         builder.AllowAnyHeader();
-                         builder.AllowAnyMethod();
+
+                         builder.WithOrigins("http://localhost:3001", "http://localhost:3000")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+
+                         //builder.AllowAnyOrigin();
+                         //builder.AllowAnyHeader();
+                         //builder.AllowAnyMethod();
+                         ////builder.AllowCredentials();
+
+
+
+                        
+
+
                      });
 });
 
@@ -65,8 +83,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+
 // app.UseMiddleware<TestMiddleware>();
+
 
 
 //app.UseWhen(context => context.Request.Path.ToString().Contains("/Register"), appbuilder =>
@@ -76,11 +95,14 @@ app.UseHttpsRedirection();
 
 
 
-//cors
+app.UseHttpsRedirection();
+
 app.UseCors("MyAllowSpecificOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHubR>("/chatR");
 
 app.MapControllers();
 
