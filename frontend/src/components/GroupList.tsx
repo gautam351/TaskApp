@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { GroupControllerServices } from '../Services/GroupServices';
 import { ToastContainer, TypeOptions, toast } from "react-toastify"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { InvokeToast } from '../utils/Toast';
 import { Avatar, Divider, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,6 +21,7 @@ const GroupList = () => {
 
     const [searchText, setsearchText] = useState("");
     let dispatch = useDispatch();
+    let {groupid} = useParams();
   
     const GetData = async () => {
         const data = await groupControllServices.getAllGroups();
@@ -101,21 +102,28 @@ const GroupList = () => {
             InvokeToast("Something Went Wrong", "error");
           }
         else if (data?.data?.status) {
+             
             InvokeToast("Left Successfully", "success");
             GetData();
+            if (groupid == grpID?.toString()) {
+                naviagte(`/groups/0`);
+            }  
         }
         else {
             InvokeToast("Unable to join ", "error");
         }
     }
 
-    const HandleGroupSelect = (grp:any) => {
-        dispatch(setcurrGroupId(grp));
+    const HandleGroupSelect = (grp: any) => {
+        
+        if (grp?.groupId != groupid) {
+            dispatch(setcurrGroupId(grp));
         dispatch(resetGroupState());
 
      console.log(grp);
      
         naviagte(`/groups/${grp?.groupId}`);
+    }
         
     }
     

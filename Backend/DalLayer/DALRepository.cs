@@ -224,9 +224,9 @@ public class DALRepository
     }
 
 
-    public bool SendMessage(string msg,int groupId,int senderId)
+    public GroupMessage SendMessage(string msg,int groupId,int senderId)
     {
-        bool result = false;
+        GroupMessage result = null;
         try
         {
             var grpMsg = new GroupMessage
@@ -240,7 +240,30 @@ public class DALRepository
 
             dbcontext.Add(grpMsg);
             dbcontext.SaveChanges();
-            result = true;
+
+
+            result = grpMsg;
+
+        }
+        catch (Exception)
+        {
+
+            result = null;
+        }
+        return result;
+    }
+
+
+    public bool UpdateMessage(int id,string msg)
+    {
+        bool result = false;
+        try
+        {
+           var msgObj= dbcontext.GroupMessages.Where(x => x.Id == id).FirstOrDefault();
+            msgObj.Msg = msg;
+            dbcontext.Update(msgObj);
+            dbcontext.SaveChanges(); 
+            result = true; 
 
         }
         catch (Exception)

@@ -21,8 +21,8 @@ const GroupReducer = createSlice({
   reducers: {
     setCurrGroups(state: any, action) {
       
-      let { recieverId } = action.payload;
-      if (state.currGrp && state.currGrp?.groupId==recieverId)
+      let { groupId } = action.payload;
+      if (state.currGrp && state.currGrp?.groupId==groupId)
         state.groups = [...state.groups, action.payload];
       
     }

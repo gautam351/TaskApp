@@ -101,10 +101,10 @@ namespace ServiceLAyer.ChatHub
 
                 Message msg = new Message(message,Convert.ToInt32(senderId), Convert.ToInt32(grpName));
 
-                _msgCotroller.SendMessage(msg);
+               var result= _msgCotroller.SendMessage(msg);
 
                 //await Clients.All.SendAsync("messageReceived", msg);
-                await Clients.Groups(grpName).SendAsync("messageReceived", msg);
+               if(result!=null) await Clients.Groups(grpName).SendAsync("messageReceived", result);
 
             }
             catch (Exception ex)

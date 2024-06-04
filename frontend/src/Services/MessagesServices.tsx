@@ -24,5 +24,21 @@ export class MessagesServices {
             return error?.response?.status;
 
         }
-    }       
+    }
+    
+
+    UpdateMessage = async (msgId:number,msg:any) => {
+        try {
+            let objBody = { Id:msgId, Msg:msg };
+            const url = this.endPoint + "/UpdateMessage";
+        
+            const { data } = await axios.put(url,  objBody, this.headerConfig);
+            return data;
+
+        } catch (error: any) {
+           
+            return error?.response?.status;
+
+        }
+    }
 }

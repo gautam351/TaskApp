@@ -43,9 +43,9 @@ namespace ServiceLAyer.Controllers
 
 
         [HttpPost]
-        public IActionResult SendMessage(Message MsgBody)
+        public GroupMessage SendMessage(Message MsgBody)
         {
-            bool result = false;
+            GroupMessage result = null;
             try
             {
 
@@ -53,13 +53,34 @@ namespace ServiceLAyer.Controllers
             }
             catch (Exception)
             {
+                //return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
+                return null;
+
+
+            }
+            //return CustomResponses.CustomResponse(message: "messages fetched successfully", 200, new { result });
+            return result;
+        }
+
+
+        [HttpPut]
+        public IActionResult UpdateMessage(UpdateMessage msgObj)
+        {
+            bool result = false;
+            try
+            {
+
+                result = repo.UpdateMessage(msgObj.Id,msgObj.Msg);
+            }
+            catch (Exception)
+            {
                 return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
 
 
             }
-            return CustomResponses.CustomResponse(message: "messages fetched successfully", 200, new { result });
-
+            return CustomResponses.CustomResponse(message: "messages updated successfully", 200, new { result });
         }
+
 
 
     }
