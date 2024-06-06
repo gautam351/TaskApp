@@ -15,7 +15,8 @@ export class MessagesServices {
 
     getAllMessages = async (grpId:number) => {
         try {
-            const url = this.endPoint + "/GetAllMessages?groupId=" + grpId;
+            
+            const url = this.endPoint + "/GetAllMessages?groupId=" + grpId+"&userId="+this.user?.id?.toString();
             const { data } = await axios.get(url, this.headerConfig);
             return data;
 
@@ -27,12 +28,12 @@ export class MessagesServices {
     }
     
 
-    UpdateMessage = async (msgId:number,msg:any) => {
+    UpdateMessage = async (msgId:number) => {
         try {
-            let objBody = { Id:msgId, Msg:msg };
-            const url = this.endPoint + "/UpdateMessage";
+           
+            const url = this.endPoint + `/AddToBoard?msgId=${msgId}&userId=${this.user?.id}`;
         
-            const { data } = await axios.put(url,  objBody, this.headerConfig);
+            const { data } = await axios.get(url, this.headerConfig);
             return data;
 
         } catch (error: any) {

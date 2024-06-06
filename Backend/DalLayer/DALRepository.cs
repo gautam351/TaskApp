@@ -1,3 +1,4 @@
+using DalLayer.HelperClassesModel;
 using DalLayer.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -207,12 +208,32 @@ public class DALRepository
     }
 
 
-    public List<GroupMessage> GetAllGroupMessages(int groupId)
+    public List<GroupMessagesAdditional> GetAllGroupMessages(int groupId,int userID)
     {
-        var result = new List<GroupMessage>();
+        var result = new List<GroupMessagesAdditional>();
         try
         {
-            result=dbcontext.GroupMessages.Where(x=>x.GroupId == groupId).ToList();
+            var temp=dbcontext.GroupMessages.Where(x=>x.GroupId == groupId).
+                ToList();
+
+            foreach (var item in temp)
+            {
+                var msg = new GroupMessagesAdditional
+                {
+                    Id = item.Id,
+                    Msg = item.Msg,
+                    GroupId = item.GroupId,
+                    SendersId = item.SendersId,
+                    Time = item.Time,
+                    isAdded = dbcontext.TaskAddeds.Where((x) => x.MessageId == item.Id && x.UserId == userID).FirstOrDefault() != null,
+
+
+                };
+                result.Add(msg);
+            }
+
+
+
 
         }
         catch (Exception)
@@ -254,6 +275,7 @@ public class DALRepository
     }
 
 
+//we will use it for the edit message fucntionality.
     public bool UpdateMessage(int id,string msg)
     {
         bool result = false;
@@ -273,6 +295,40 @@ public class DALRepository
         }
         return result;
     }
+
+// Add task to the board
+public int AddTaskToBoard(int msgid,int userid)
+    {
+        int result = 0;
+        try
+        {
+            var check=dbcontext.TaskAddeds.Where(x=>x.UserId==userid && x.MessageId==msgid).FirstOrDefault();
+
+            if (check != null)
+            {
+                dbcontext.Remove(check);
+                dbcontext.SaveChanges();
+                return -1;
+            }
+
+            TaskAdded obj = new()
+            {
+                MessageId = msgid,  
+                UserId = userid 
+            };
+            dbcontext.Add(obj);
+            dbcontext.SaveChanges();
+            result = 1;  
+        }
+        catch (Exception)
+        {
+
+            result = 0;
+        }
+        return result;
+    }
+
+
 
 }
 

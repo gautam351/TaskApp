@@ -59,7 +59,8 @@ const ChatBody = ({ groupid }) => {
   const [chats, setchats] = useState([]);
 
   useEffect(() => {
-    setchats([...groups]);
+    if (groups?.length > 0) setchats([...groups]);
+    else setchats([]);
 
   }, [groups])
 
@@ -180,22 +181,16 @@ const ChatBody = ({ groupid }) => {
   const UpdateMessage = async (Type, msg, id, indx) => {
 
     let newMessage = msg;
-    switch (Type) {
-      case "Add": newMessage["ToggleAdd"] = true; break;
-      case "Remove": newMessage["ToggleAdd"] = false; break;
-      case "Like": newMessage["ToggleLike"] = true; break;
-      case "Dislike": newMessage["ToggleLike"] = false; break;
-
-    }
-    const { data } = await MessageSerivesObj.UpdateMessage(id, JSON.stringify(newMessage))
-
-
-    if (data?.result) {
+   
+    const { data } = await MessageSerivesObj.UpdateMessage(id);
+    
+  
+    if (data?.result=="Added Successfully" || data?.result=="Removed Successfully") {
       let temp = [...chats];
-      temp[indx] = { ...temp[indx], msg: JSON.stringify(newMessage) };
+      temp[indx] = { ...temp[indx], isAdded: !temp[indx]?.isAdded};
       setchats(temp);
-      if (Type == "Add") InvokeToast("Added to Board", "success");
-      else if (Type == "Remove") InvokeToast("Removed from Board", "success");
+      if (data?.result == "Added Successfully") InvokeToast("Added to Board", "success");
+      else if (data?.result == "Removed Successfully") InvokeToast("Removed from Board", "success");
     }
     else {
       InvokeToast("Something went wrong", "error");
@@ -246,7 +241,7 @@ const ChatBody = ({ groupid }) => {
                           }}>
 
                             {
-                              addToggle ?
+                              e?.isAdded ?
                                 <CheckCircleIcon className='icon' /> :
                                 <AddCircleIcon className="icon" />
 
@@ -273,6 +268,7 @@ const ChatBody = ({ groupid }) => {
 
                     : <p className="msgchip">{e.msg}</p>
                 }
+               
               </div>
             );
 

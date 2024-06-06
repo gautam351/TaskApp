@@ -1,4 +1,5 @@
 ﻿using DalLayer;
+using DalLayer.HelperClassesModel;
 using DalLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +24,13 @@ namespace ServiceLAyer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllMessages(int  groupId)
+        public IActionResult GetAllMessages(int  groupId,int userId)
         {    
-            List<GroupMessage> messages = new();   
+            List<GroupMessagesAdditional> messages = new();   
             try
             {
 
-              messages=  repo.GetAllGroupMessages(groupId);
+              messages=  repo.GetAllGroupMessages(groupId,userId);
             }
             catch (Exception)
             {
@@ -81,6 +82,26 @@ namespace ServiceLAyer.Controllers
             return CustomResponses.CustomResponse(message: "messages updated successfully", 200, new { result });
         }
 
+
+        [HttpGet]
+        public IActionResult AddToBoard(int msgId,int userId)
+        {
+            string result = "";
+            try
+            {
+                var check = repo.AddTaskToBoard(msgId, userId);
+                if (check == 1) result = "Added Successfully";
+                else if (check == -1) result = "Removed Successfully";
+                else if (check == 0) result = "Something went wrong";
+            }
+            catch (Exception)
+            {
+
+                return CustomResponses.CustomResponse("Internal Server Error", 500, new { });
+
+            }
+            return CustomResponses.CustomResponse(message: "messages Added successfully", 200, new { result });
+        }
 
 
     }
