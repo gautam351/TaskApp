@@ -329,6 +329,88 @@ public int AddTaskToBoard(int msgid,int userid)
     }
 
 
+// Retrive all the baord Messages for a particular User
+  public List<BoardData> GetBoardData(int userId)
+    {
+        List<BoardData> result = null;
+        try
+        {
+           result= dbcontext.GroupMessages.Join(dbcontext.TaskAddeds,
+                (x) => x.Id,
+                (x) => x.MessageId,
+                (msg, task) => new { msg = msg, task = task }
+
+                ).Where((obj_joined) => obj_joined.task.UserId == userId).Select((x) =>
+              
+                   new BoardData
+                    {
+                        Id = x.msg.Id,
+                        Msg = x.msg.Msg,
+                        Time = x.msg.Time,
+                        Status = x.task.Status,
+                        TaskId=x.task.Id
+                    }
+
+                  
+                
+
+                ).ToList();
+            // write a join query using linq to join TaskAdded and GroupMessages using id and MessageId field
+
+        }
+        catch (Exception)
+        {
+
+            result = new();
+        }
+        return result;
+    }
+
+
+    public int  UpdateBoardStatus(int taskId,int status)
+    {
+        int result = 0;
+        try
+        {
+           var obj= dbcontext.TaskAddeds.Where((x) => x.Id == taskId).FirstOrDefault();
+            if (obj== null)return -1;
+            obj.Status = status;
+            dbcontext.Update(obj);
+            dbcontext.SaveChanges();
+            result = 1;
+
+        }
+        catch (Exception)
+        {
+
+            result = 0;
+        }
+        return result;
+
+    }
+
+
+    public int DeleteTaskFromBoard(int taskID)
+    {
+        int result = 0;
+        try
+        {
+            var check = dbcontext.TaskAddeds.Where((x) => x.Id == taskID).FirstOrDefault();
+            dbcontext.Remove(check);
+            dbcontext.SaveChanges();
+            result = 1;
+
+        }
+        catch (Exception)
+        {
+
+            result = 0;
+            
+        }
+        return result;
+    }
+
+
 
 }
 

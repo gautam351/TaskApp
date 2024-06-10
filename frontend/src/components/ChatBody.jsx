@@ -229,7 +229,7 @@ const ChatBody = ({ groupid }) => {
                           {msg?.description}
                         </Typography>
                         <Typography color="textSecondary" style={{ fontSize: '14px', color: '#5e6c84' }}>
-                          URL: <a href={msg?.url} style={{ color: '#0052cc' }}>{msg?.url}</a>
+                          URL: <a href={msg?.url} target="_blank" style={{ color: '#0052cc' }}>Link</a>
                         </Typography>
 
                         <div className="btns-container">

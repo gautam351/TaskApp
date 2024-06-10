@@ -116,7 +116,7 @@ export default function TaskCardCreation({open,setOpen,id}) {
             id="Link"
             name="Link"
             label="Link"
-            type="text" 
+            type="url" 
             fullWidth
                       variant="standard"
                       value={url}     

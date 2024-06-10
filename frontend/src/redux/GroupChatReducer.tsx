@@ -3,7 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
    groups: [],
-   currGrp:{},
+  currGrp: {},
+   boardData:[],
     loading: false,
     error:""
 }
@@ -39,6 +40,11 @@ const GroupReducer = createSlice({
       
       state.currGrp = action.payload;
     },
+
+    setBoardData(state, action) {
+      
+      state.boardData = action.payload;
+    },
    
      resetGroupState(state) {
        state.groups = [];
@@ -53,6 +59,6 @@ const GroupReducer = createSlice({
 
 
 // Action creators are generated for each case reducer function
-export const { setCurrGroups ,setcurrGroupId,resetGroupState,setCurrGroupsApiData } = GroupReducer.actions
+export const { setCurrGroups ,setcurrGroupId,resetGroupState,setCurrGroupsApiData,setBoardData } = GroupReducer.actions
 
 export default GroupReducer.reducer;

@@ -122,6 +122,10 @@ namespace DalLayer.Models
 
                 entity.Property(e => e.MessageId).HasColumnName("messageID");
 
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.UserId).HasColumnName("userID");
             });
 
